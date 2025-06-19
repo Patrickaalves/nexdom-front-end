@@ -10,7 +10,7 @@ import Customer from '../pages/Customer.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: { name: 'products' },      // <- usa “name” em vez de string de path
+    redirect: { name: 'products' },
   },
   {
     path: '/supplier',

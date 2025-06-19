@@ -1,13 +1,10 @@
-<!-- AppLayout.vue -->
 <template>
   <v-app>
-    <!-- Barra superior -->
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title>Controle de Estoque</v-toolbar-title>
     </v-app-bar>
 
-    <!-- Drawer fixo que empurra o conteúdo -->
     <v-navigation-drawer
       app
       v-model="drawer"
@@ -16,7 +13,7 @@
       elevation="1"
     >
       <v-list nav dense>
-        <v-list-group prepend-icon="mdi-truck" value="true">
+        <v-list-group prepend-icon="mdi-truck" value="suppliers">
           <template #activator="{ props }">
             <v-list-item v-bind="props" title="Fornecedores" />
           </template>
@@ -26,7 +23,7 @@
           </v-list-item>
         </v-list-group>
 
-        <v-list-group prepend-icon="mdi-account-tie" value="true">
+        <v-list-group prepend-icon="mdi-account-tie" value="customer">
           <template #activator="{ props }">
             <v-list-item v-bind="props" title="Clientes" />
           </template>
@@ -36,7 +33,7 @@
           </v-list-item>
         </v-list-group>
 
-        <v-list-group prepend-icon="mdi-package-variant" value="true">
+        <v-list-group prepend-icon="mdi-package-variant" value="products">
           <template #activator="{ props }">
             <v-list-item v-bind="props" title="Produtos" />
           </template>
@@ -50,7 +47,7 @@
           </v-list-item>
         </v-list-group>
 
-        <v-list-group prepend-icon="mdi-swap-horizontal" value="false">
+        <v-list-group prepend-icon="mdi-swap-horizontal" value="moviment-stocks">
           <template #activator="{ props }">
             <v-list-item v-bind="props" title="Movimentos de Estoque" />
           </template>
@@ -59,11 +56,9 @@
             <v-list-item-title>Movimento De Estoque</v-list-item-title>
           </v-list-item>
         </v-list-group>
-
       </v-list>
     </v-navigation-drawer>
 
-    <!-- Conteúdo principal -->
     <v-main class="bg-grey-lighten-3" style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
       <router-view />
     </v-main>

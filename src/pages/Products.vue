@@ -35,7 +35,7 @@
 
         <!-- Header Ação -->
         <template #header.action>
-          <th style="width: 100px; text-align: center;">Ação</th>
+          <th style="width: 100px; text-align: center; font-weight: 100;">Ação</th>
         </template>
       </v-data-table>
 
@@ -47,7 +47,7 @@
         location="top right"
         @update:model-value="val => { if (!val) store.successVisible = false }"
       >
-        {{ store.successMessage }}
+        <span class="text-center w-100">{{ store.successMessage }}</span>
       </v-snackbar>
 
       <!-- Snackbar de erro -->
@@ -58,7 +58,7 @@
         top
         @update:model-value="val => { if (!val) store.error = null }"
       >
-        {{ store.error }}
+        <span class="text-center w-100">{{ store.error }}</span>
       </v-snackbar>
 
       <!-- Formulário -->

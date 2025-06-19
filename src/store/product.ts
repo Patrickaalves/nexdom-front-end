@@ -4,7 +4,7 @@ import type { ProductType } from '../constants/product-types'
 
 /* ---------- Tipos ---------- */
 export interface Product {
-  productId?: string
+  productId: string
   code: string
   productType: ProductType
   supplierPrice: number
@@ -45,14 +45,14 @@ export const useProductStore = defineStore('product', {
         const { data } = await api.get('/product', { params: { page, size } })
 
         this.products = data.content.map((p: any) => ({
-          productId:      p.productId,
-          code:           p.code,
-          productType:    p.productType,
-          supplierPrice:  p.supplierPrice,
-          stockQuantity:  p.stockQuantity,
+          productId: p.productId,
+          code: p.code,
+          productType: p.productType,
+          supplierPrice: p.supplierPrice,
+          stockQuantity: p.stockQuantity,
         }))
 
-        this.page       = page
+        this.page = page
         this.totalPages = data.totalPages
       } catch {
         this.error = 'Erro ao carregar produtos'
@@ -67,11 +67,11 @@ export const useProductStore = defineStore('product', {
         const { data } = await api.post('/product', product)
 
         this.products.push({
-          productId:      data.productId,
-          code:           data.code,
-          productType:    data.productType,
-          supplierPrice:  data.supplierPrice,
-          stockQuantity:  data.stockQuantity,
+          productId: data.productId,
+          code: data.code,
+          productType: data.productType,
+          supplierPrice: data.supplierPrice,
+          stockQuantity: data.stockQuantity,
         })
 
         this.successMessage = 'Produto cadastrado com sucesso!'
@@ -94,22 +94,17 @@ export const useProductStore = defineStore('product', {
     },
 
     async updateProduct(index: number, product: Product) {
-      this.clearMessages()
-
-      if (!product.productId) {
-        this.error = 'Produto sem ID não pode ser atualizado.'
-        return
-      }
+      this.clearMessages();
 
       try {
         const { data } = await api.put(`/product/${product.productId}`, product)
 
         this.products[index] = {
-          productId:      data.productId,
-          code:           data.code,
-          productType:    data.productType,
-          supplierPrice:  data.supplierPrice,
-          stockQuantity:  data.stockQuantity,
+          productId: data.productId,
+          code: data.code,
+          productType: data.productType,
+          supplierPrice: data.supplierPrice,
+          stockQuantity: data.stockQuantity,
         }
 
         this.successMessage = 'Produto atualizado com sucesso!'
@@ -141,11 +136,6 @@ export const useProductStore = defineStore('product', {
           this.error = 'Erro ao deletar produto'
         }
       }
-    },
-
-    /* Helper */
-    getProductsByType(type: Product['productType']) {
-      return this.products.filter(p => p.productType === type)
     },
   },
 })
