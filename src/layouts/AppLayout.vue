@@ -42,8 +42,8 @@
             <v-list-item-title>Produto</v-list-item-title>
           </v-list-item>
 
-          <v-list-item link @click="goTo('product-profit')">
-            <v-list-item-title>Lucro Por Produto</v-list-item-title>
+          <v-list-item link @click="goTo('product-informations')">
+            <v-list-item-title>Informações do Produto</v-list-item-title>
           </v-list-item>
         </v-list-group>
 

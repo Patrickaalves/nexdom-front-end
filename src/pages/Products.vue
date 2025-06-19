@@ -19,7 +19,7 @@
         </template>
 
         <template #item.supplier="{ item }">
-          {{ supplierById[item.supplier] ?? '—' }}
+          {{ supplierById[item.supplier] }}
         </template>
 
         <!-- Coluna Preço Fornecedor -->

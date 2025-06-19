@@ -11,27 +11,24 @@
         fixed-header
         height="570"
         class="mt-2"
-        style="max-width: 100%;"
+        style="max-width: 90%;"
       >
         <!-- Coluna Tipo -->
-        <!-- <template #item.stockMovementType="{ item }">
-          {{ stockMovementTypeLabels[item.stockMovementType] }}
-        </template> -->
 
-        <!-- <template #item.supplier="{ item }">
-          {{ supplierById[item.supplier] ?? '—' }}
-        </template> -->
+        <template #item.saleDate="{ item }">
+          {{ formatDate(item.saleDate) }}
+        </template>
 
-        <!-- Coluna Preço Fornecedor -->
-        <!-- <template #item.supplierPrice="{ item }">
-          {{ truncate2(item.supplierPrice).toFixed(2).replace('.', ',') }}
-        </template> -->
+        <template #item.customerId="{ item }">
+          {{ customerById[item.customerId] }}
+        </template>
+
+        <template #item.operationType="{ item }">
+          {{ operationTypeLabels[item.operationType] }}
+        </template>
 
         <!-- Coluna Ações -->
         <template #item.action="{ index }">
-          <v-btn icon small class="action-btn" color="blue-darken-2" @click="editStockMovement(index)">
-            <v-icon size="18">mdi-pencil-outline</v-icon>
-          </v-btn>
           <v-btn icon small class="action-btn" color="red-darken-2" @click="deleteStockMovement(index)">
             <v-icon size="18">mdi-trash-can-outline</v-icon>
           </v-btn>
@@ -39,7 +36,7 @@
 
         <!-- Header Ação -->
         <template #header.action>
-          <th style="width: 100px; text-align: center; font-weight: 100;">Ação</th>
+          <th style="width: 50px;  font-weight: 100;">Ação</th>
         </template>
       </v-data-table>
 
@@ -68,42 +65,57 @@
       <!-- Formulário -->
       <v-dialog v-model="showDialog" max-width="500">
         <v-card>
-          <v-card-title>{{ isEditing ? 'Editar Movimento de estoque' : 'Novo Movimento de estoque' }}</v-card-title>
+          <v-card-title>{{ 'Novo Movimento de estoque' }}</v-card-title>
           <v-card-text>
-            <v-text-field v-model="form.code" label="Código" />
-
-            <!-- <v-select
-              v-model="form.stockMovementType"
-              :items="typeItems"
+            <v-select
+              v-model="form.operationType"
+              :items="operationType"
               item-title="title"
               item-value="value"
-              label="Tipo Produto"
+              label="Tipo de Operação"
               :rules="[v => !!v || 'Tipo é obrigatório']"
-            /> -->
+            />
 
-            <!-- <v-select
-              v-model="form.supplier"
-              :items="supplierOptions"
+            <v-select
+              v-model="form.productId"
+              :items="productOptions"
               item-title="title"
               item-value="value"
-              label="Fornecedor"
-              :disabled="isEditing"
+              label="Produto"
+              :return-object="false"
+              :loading="productStore.loading"
+            />
+
+            <v-select
+              v-model="form.customerId"
+              :items="customerOptions"
+              item-title="title"
+              item-value="value"
+              label="Cliente"
               :return-object="false"
               :loading="customerStore.loading"
-            /> -->
+            />
 
-            <!-- <v-text-field
-              v-model.number="form.supplierPrice"
-              label="Valor Fornecedor"
+            <v-text-field
+              v-model.number="form.salePrice"
+              label="Preco da venda"
               type="number"
               step="0.01"
-              @blur="form.supplierPrice = truncate2(form.supplierPrice)"
+              @blur="form.salePrice = truncate2(form.salePrice)"
             />
+
             <v-text-field
-              v-model.number="form.stockQuantity"
-              label="Quantidade Estoque"
+              v-model.number="form.movementQuantity"
+              label="Quantidade Movimentada"
               type="number"
-            /> -->
+            />
+
+            <v-text-field
+              v-model="form.saleDate"
+              label="Data de Venda"
+              type="date"
+              :rules="[v => !!v || 'Data é obrigatória']"
+            />
           </v-card-text>
 
           <v-card-actions>
@@ -121,7 +133,9 @@ import { ref, reactive, computed, onMounted, toRaw, watch } from 'vue'
 import { useProductStore} from '../store/product'
 import { useStockMovementStore, type StockMovement } from '../store/stockmovement'
 import { useCustomerStore } from '../store/customer'
+import { operationTypeLabels } from '../constants/operation-type'
 import PageCard from '../components/PageCard.vue'
+import { format } from 'date-fns'
 
 /* ---------- Store ---------- */
 const stockMovementStore = useStockMovementStore()
@@ -130,7 +144,6 @@ const productStore = useProductStore()
 
 /* ---------- Estado local ---------- */
 const showDialog = ref(false)
-const isEditing  = ref(false)
 const editIndex  = ref(-1)
 
 const showError  = ref(false)
@@ -138,59 +151,74 @@ const saving     = ref(false)
 
 /* ---------- Cabeçalhos ---------- */
 const headers = [
-  { title: 'Código',           key: 'code' },
-  { title: 'Tipo',             key: 'stockMovementType' },
-  { title: 'Preço Fornecedor', key: 'supplierPrice' },
-  { title: 'Fornecedor',       key: 'supplier' },
-  { title: 'Qtd. Estoque',     key: 'stockQuantity' },
-  { title: 'Ação',             key: 'action', sortable: false },
+  { title: 'Código do Produto',      key: 'productCode' },
+  { title: 'Cliente',                key: 'customerId' },
+  { title: 'Qtd. movimentada',       key: 'movementQuantity' },
+  { title: 'Valor da venda',         key: 'salePrice' },
+  { title: 'Data da venda',          key: 'saleDate' },
+  { title: 'Tipo de operacao',       key: 'operationType' },
+  { title: 'Ação',                   key: 'action', sortable: false},
 ]
 
 /* ---------- Computeds ---------- */
 const stockMovements = computed(() => stockMovementStore.stockMovements)
 
-// const typeItems = computed(() =>
-//   Object.entries(stockMovementTypeLabels).map(([value, title]) => ({ value, title })),
-// )
+const productOptions = computed(() =>
+  productStore.products.map(p => ({
+    title: `${p.code}`,   
+    value: p.productId
+  }))
+)
 
-// const supplierOptions = computed(() =>
-//   customerStore.suppliers.map(s => ({
-//     title: `${s.code} - ${s.name}`,   
-//     value: s.supplierId
-//   }))
-// )
+const customerOptions = computed(() =>
+  customerStore.customers.map(c => ({
+    title: `${c.code} - ${c.name}`,
+    value: c.customerId
+  }))
+)
 
-// const supplierById = computed(() =>
-//   Object.fromEntries(
-//     customerStore.suppliers.map(s => [s.supplierId, s.name])
-//   )
-// )
+const operationType = computed(() => 
+  Object.entries(operationTypeLabels).map(([value, title]) => ({ value, title }))
+)
+
+const customerById = computed(() => 
+  Object.fromEntries(
+    customerStore.customers.map(p => [p.customerId, p.code])
+  )
+)
 
 /* ---------- Formulário ---------- */
 const form = reactive<StockMovement>({
-  stockMovementId: undefined,
-  code: '',
-  // stockMovementType: 'ELETRONIC',
-  // supplier: undefined,
-  // supplierPrice: 0,
-  // stockQuantity: 0,
+  stockMovementId:  '',
+  productId:        '',
+  operationType:    undefined,
+  salePrice:        0,
+  saleDate:         '',
+  movementQuantity: 0,
+  customerId:       '',
+  productCode:      ''
 })
 
 function resetForm() {
-  form.stockMovementId     = undefined
-  form.code          = ''
-  // form.stockMovementType   = 'ELETRONIC'
-  // form.supplier    = undefined
-  // form.supplierPrice = 0
-  // form.stockQuantity = 0
+  form.stockMovementId  = undefined
+  form.productId        = ''
+  form.operationType    = undefined
+  form.salePrice        = 0
+  form.saleDate         = ''
+  form.movementQuantity = 0
+  form.customerId       = ''
+  form.productCode      = ''
 }
 
 /* ---------- Lifecycle ---------- */
 onMounted(() => {
   stockMovementStore.fetchStockMovements()
-  // if (customerStore.suppliers.length === 0) {
-  //   customerStore.fetchSuppliers()
-  // }
+  if (customerStore.customers.length === 0) {
+    customerStore.fetchCustomers()
+  }
+  if (productStore.products.length === 0) {
+    productStore.fetchProducts()
+  }
 })
 
 /* ---------- Ações UI ---------- */
@@ -199,11 +227,14 @@ async function save() {
 
   const stockMovement = toRaw(form)
 
-  if (isEditing.value) {
-    await stockMovementStore.updateStockMovement(editIndex.value, stockMovement)
-  } else {
-    await stockMovementStore.addStockMovement(stockMovement)
+  if (form.saleDate) {
+    const now   = new Date()                     // hora atual
+    const hh    = String(now.getHours()).padStart(2, '0')
+    const mm    = String(now.getMinutes()).padStart(2, '0')
+
+    form.saleDate = `${form.saleDate}T${hh}:${mm}:00` // "YYYY-MM-DDTHH:MM:00"
   }
+  await stockMovementStore.addStockMovement(stockMovement)
 
   saving.value = false
 
@@ -211,22 +242,22 @@ async function save() {
   if (!stockMovementStore.error) {
     showDialog.value = false
     resetForm()
-    isEditing.value  = false
   }
 }
 
 function editStockMovement(index: number) {
   const p = stockMovementStore.stockMovements[index]
 
-  form.stockMovementId     = p.stockMovementId
-  form.code          = p.code
-  // form.stockMovementType   = p.stockMovementType
-  // form.supplier      = p.supplier
-  // form.supplierPrice = p.supplierPrice
-  // form.stockQuantity = p.stockQuantity
+  form.stockMovementId  = p.stockMovementId
+  form.productId        = p.productId
+  form.operationType    = p.operationType
+  form.salePrice        = p.salePrice
+  form.saleDate         = p.saleDate
+  form.movementQuantity = p.movementQuantity
+  form.customerId       = p.customerId
+  form.productCode      = p.productCode
 
   editIndex.value = index
-  isEditing.value = true
   showDialog.value = true
 }
 
@@ -237,11 +268,15 @@ async function deleteStockMovement(index: number) {
 function cancel() {
   showDialog.value = false
   resetForm()
-  isEditing.value = false
 }
 
 function truncate2(value: number): number {
   return Math.trunc(value * 100) / 100
+}
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr)
+  return format(date, 'dd/MM/yyyy HH:mm')
 }
 
 /* ---------- Watchers ---------- */

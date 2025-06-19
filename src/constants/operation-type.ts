@@ -3,4 +3,4 @@ export const operationTypeLabels: Record<string, string> = {
   EXIT: 'Saida',
 } as const
 
-export type ProductType = keyof typeof operationTypeLabels
+export type OperationType = keyof typeof operationTypeLabels

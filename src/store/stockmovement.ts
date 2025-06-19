@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
 import { api } from '../api/http'
+import { OperationType} from '../constants/operation-type'
 
 /* ---------- Tipos ---------- */
 export interface StockMovement {
   stockMovementId: string
-  code: string
+  productId: string
+  operationType: OperationType
+  salePrice: number
+  saleDate: string
+  movementQuantity: number
+  customerId: string
+  productCode: string
 }
 
 /* ---------- Store ---------- */
@@ -41,8 +48,14 @@ export const useStockMovementStore = defineStore('stock-movement', {
         const { data } = await api.get('/stock-movement', { params: { page, size } })
 
         this.stockMovements = data.content.map((p: any) => ({
-          stockMovementId: p.stockMovementId,
-          code: p.code
+            stockMovementId: p.stockMovementId,
+            productId: p.productId,
+            operationType: p.operationType,
+            salePrice: p.salePrice,
+            saleDate: p.saleDate,
+            movementQuantity: p.movementQuantity,
+            customerId: p.customerId,
+            productCode: p.productCode
         }))
 
         this.page = page
@@ -61,7 +74,13 @@ export const useStockMovementStore = defineStore('stock-movement', {
 
         this.stockMovements.push({
           stockMovementId: data.stockMovementId,
-          code: data.code,
+            productId: data.productId,
+            operationType: data.operationType,
+            salePrice: data.salePrice,
+            saleDate: data.saleDate,
+            movementQuantity: data.movementQuantity,
+            customerId: data.customerId,
+            productCode: data.productCode
         })
 
         this.successMessage = 'Movimento de estoque cadastrado com sucesso!'
@@ -79,32 +98,6 @@ export const useStockMovementStore = defineStore('stock-movement', {
           this.error = 'Erro ao salvar Movimento de estoque: ' + data
         } else {
           this.error = 'Erro ao salvar Movimento de estoque'
-        }
-      }
-    },
-
-    async updateStockMovement(index: number, stockMovement: StockMovement) {
-      this.clearMessages();
-
-      try {
-        const { data } = await api.put(`/stock-movement/${stockMovement.stockMovementId}`, stockMovement)
-
-        this.stockMovements[index] = {
-          stockMovementId: data.stockMovementId,
-          code: data.code,
-        //   stock-movementType: data.stock-movementType,
-        //   supplier: data.supplier,
-        //   supplierPrice: data.supplierPrice,
-        //   stockQuantity: data.stockQuantity,
-        }
-
-        this.successMessage = 'Movimento de estoque atualizado com sucesso!'
-        this.successVisible = true
-      } catch (error: any) {
-        if (error.response?.data?.errorMessage) {
-          this.error = 'Erro ao atualizar Movimento de estoque: ' + error.response.data.errorMessage
-        } else {
-          this.error = 'Erro ao atualizar Movimento de estoque'
         }
       }
     },

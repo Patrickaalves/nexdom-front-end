@@ -3,7 +3,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import Produtos from '../pages/Products.vue'
 import StockMovements from '../pages/StockMovements.vue'
-import ProductProfit from '../pages/ProductProfit.vue'
+import ProductInformations from '../pages/ProductInformations.vue'
 import Supplier from '../pages/Supplier.vue'
 import Customer from '../pages/Customer.vue'
 
@@ -34,9 +34,9 @@ const routes: RouteRecordRaw[] = [
   },
 
     {
-    path: '/product-profit',
-    name: 'product-profit',
-    component: ProductProfit,
+    path: '/product-informations',
+    name: 'product-informations',
+    component: ProductInformations,
   },
 ]
 
