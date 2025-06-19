@@ -12,19 +12,37 @@
       app
       v-model="drawer"
       color="primary"
-      width="220"
+      width="300"
       elevation="1"
     >
       <v-list nav dense>
+        <v-list-group prepend-icon="mdi-truck" value="true">
+          <template #activator="{ props }">
+            <v-list-item v-bind="props" title="Fornecedores" />
+          </template>
 
-        <!-- ▸ Produtos -->
+          <v-list-item link @click="goTo('supplier')">
+            <v-list-item-title>Fornecedor</v-list-item-title>
+          </v-list-item>
+        </v-list-group>
+
+        <v-list-group prepend-icon="mdi-account-tie" value="true">
+          <template #activator="{ props }">
+            <v-list-item v-bind="props" title="Clientes" />
+          </template>
+
+          <v-list-item link @click="goTo('customer')">
+            <v-list-item-title>Cliente</v-list-item-title>
+          </v-list-item>
+        </v-list-group>
+
         <v-list-group prepend-icon="mdi-package-variant" value="true">
           <template #activator="{ props }">
             <v-list-item v-bind="props" title="Produtos" />
           </template>
 
           <v-list-item link @click="goTo('products')">
-            <v-list-item-title>Listar Produtos</v-list-item-title>
+            <v-list-item-title>Produto</v-list-item-title>
           </v-list-item>
 
           <v-list-item link @click="goTo('product-profit')">
@@ -32,16 +50,14 @@
           </v-list-item>
         </v-list-group>
 
-        <!-- ▸ Movimento de Estoque -->
         <v-list-group prepend-icon="mdi-swap-horizontal" value="false">
           <template #activator="{ props }">
-            <v-list-item v-bind="props" title="Movimento de Estoque" />
+            <v-list-item v-bind="props" title="Movimentos de Estoque" />
           </template>
 
           <v-list-item link @click="goTo('stock-movements')">
-            <v-list-item-title>Listar Movimentos</v-list-item-title>
+            <v-list-item-title>Movimento De Estoque</v-list-item-title>
           </v-list-item>
-
         </v-list-group>
 
       </v-list>

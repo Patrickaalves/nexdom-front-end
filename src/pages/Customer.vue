@@ -3,7 +3,7 @@
     <v-container fluid>
       <v-row dense>
         <v-col cols="16" md="6">
-          <h1>Movimento De Estoque</h1>
+          <h1>Cliente</h1>
         </v-col>
       </v-row>
     </v-container>
