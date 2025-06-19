@@ -57,7 +57,7 @@ export const useProductStore = defineStore('product', {
         this.page = page
         this.totalPages = data.totalPages
       } catch {
-        this.error = 'Erro ao carregar produtos'
+        this.error = 'Erro ao carregar Produtos'
       } finally {
         this.loading = false
       }
@@ -87,11 +87,11 @@ export const useProductStore = defineStore('product', {
             .map((e: any) => e.defaultMessage || e.message || 'Erro desconhecido')
             .join('\n• ')
         } else if (data?.errorMessage) {
-          this.error = 'Erro ao salvar produto: ' + data.errorMessage
+          this.error = 'Erro ao salvar Produto: ' + data.errorMessage
         } else if (typeof data === 'string') {
-          this.error = 'Erro ao salvar produto: ' + data
+          this.error = 'Erro ao salvar Produto: ' + data
         } else {
-          this.error = 'Erro ao salvar produto'
+          this.error = 'Erro ao salvar Produto'
         }
       }
     },
@@ -117,9 +117,9 @@ export const useProductStore = defineStore('product', {
         this.successVisible = true
       } catch (error: any) {
         if (error.response?.data?.errorMessage) {
-          this.error = 'Erro ao atualizar produto: ' + error.response.data.errorMessage
+          this.error = 'Erro ao atualizar Produto: ' + error.response.data.errorMessage
         } else {
-          this.error = 'Erro ao atualizar produto'
+          this.error = 'Erro ao atualizar Produto'
         }
       }
     },
@@ -137,9 +137,9 @@ export const useProductStore = defineStore('product', {
         this.successVisible = true
       } catch (error: any) {
         if (error.response?.data?.errorMessage) {
-          this.error = 'Erro ao deletar produto: ' + error.response.data.errorMessage
+          this.error = 'Erro ao deletar Produto: ' + error.response.data.errorMessage
         } else {
-          this.error = 'Erro ao deletar produto'
+          this.error = 'Erro ao deletar Produto'
         }
       }
     },

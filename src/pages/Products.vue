@@ -154,7 +154,7 @@ const typeItems = computed(() =>
 
 const supplierOptions = computed(() =>
   supplierStore.suppliers.map(s => ({
-    title: `${s.name}`,   
+    title: `${s.code} - ${s.name}`,   
     value: s.supplierId
   }))
 )
