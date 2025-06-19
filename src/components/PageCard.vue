@@ -21,7 +21,7 @@ const props = defineProps<{
 
 const computedStyle = computed(() => {
   const styles: Record<string, string> = {
-    margin: props.margin ?? '16px auto',
+    margin: props.margin ?? '24px auto',
     padding: props.padding ?? '24px',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',

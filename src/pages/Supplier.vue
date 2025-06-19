@@ -5,7 +5,7 @@
         <v-col>
           <h1>Fornecedor</h1>
           <v-btn @click="showDialog = true" color="green-darken-1">Novo Fornecedor</v-btn>
-          <v-data-table :items="suppliers" :headers="headers" fixed-header height="570px" class="mt-2"
+          <v-data-table :items="suppliers" :headers="headers" fixed-header height="500px" class="mt-2"
             style="max-width: 100%;">
             <template #item.phone="{ item }">
               {{ item.phone == null ? "SEM CADASTRO" : item.phone }}

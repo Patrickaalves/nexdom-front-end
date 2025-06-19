@@ -9,7 +9,7 @@
         :items="stockMovements"
         :headers="headers"
         fixed-header
-        height="570"
+        height="500px"
         class="mt-2"
         style="max-width: 90%;"
       >
