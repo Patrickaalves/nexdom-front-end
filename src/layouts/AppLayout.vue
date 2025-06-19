@@ -1,8 +1,30 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title>Controle de Estoque</v-toolbar-title>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+      style="flex-direction: column; align-items: flex-start; padding-left: 16px; padding-bottom: 8px;"
+    >
+      <div style="display: flex; align-items: center; width: 47%;">
+        <v-app-bar-nav-icon @click="drawer = !drawer" />
+        <v-toolbar-title style="margin-left: 8px;">Controle de Estoque</v-toolbar-title>
+      </div>
+
+      <v-breadcrumbs
+        v-if="breadcrumbs.length"
+        style="font-size: 1.2rem; width: auto; margin-left: 0; justify-content: flex-start; padding: 0;"
+        class="ma-0 pa-0"
+      >
+        <v-breadcrumbs-item
+          v-for="(item, index) in breadcrumbs"
+          :key="index"
+          :disabled="index === breadcrumbs.length - 1"
+          style="padding: 0 4px;"
+        >
+          {{ item }}
+        </v-breadcrumbs-item>
+      </v-breadcrumbs>
     </v-app-bar>
 
     <v-navigation-drawer
@@ -66,13 +88,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const drawer = ref(true)
 const router = useRouter()
-
 function goTo(name: string) {
   router.push({ name })
 }
+
+const route = useRoute()
+
+const breadcrumbs = computed(() => {
+  return (route.meta.breadcrumb as string[] | undefined) ?? []
+})
 </script>

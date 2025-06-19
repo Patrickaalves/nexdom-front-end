@@ -1,7 +1,7 @@
 // src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
-import Produtos from '../pages/Products.vue'
+import Product from '../pages/Products.vue'
 import StockMovements from '../pages/StockMovements.vue'
 import ProductInformations from '../pages/ProductInformations.vue'
 import Supplier from '../pages/Supplier.vue'
@@ -16,28 +16,42 @@ const routes: RouteRecordRaw[] = [
     path: '/supplier',
     name: 'supplier',
     component: Supplier,
+    meta: {
+      breadcrumb: ['Fornecedores', 'Fornecedor']
+    }
   },
   {
     path: '/customer',
     name: 'customer',
     component: Customer,
+    meta: {
+      breadcrumb: ['Clientes', 'Cliente']
+    }
   },
   {
     path: '/products',
     name: 'products',
-    component: Produtos,
+    component: Product,
+    meta: {
+      breadcrumb: ['Produtos', 'Produto']
+    }
+  },
+  {
+    path: '/product-informations',
+    name: 'product-informations',
+    component: ProductInformations,
+    meta: {
+      breadcrumb: ['Produtos', 'Informações do Produto']
+    }
   },
   {
     path: '/stock-movements',
     name: 'stock-movements',
     component: StockMovements,
-  },
-
-    {
-    path: '/product-informations',
-    name: 'product-informations',
-    component: ProductInformations,
-  },
+    meta: {
+      breadcrumb: ['Movimentos de Estoque', 'Movimento De Estoque']
+    }
+  }
 ]
 
 const router = createRouter({
