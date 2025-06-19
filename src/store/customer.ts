@@ -1,17 +1,16 @@
 import { defineStore } from 'pinia'
 import { api } from '../api/http'
 
-export interface Supplier {
-    supplierId: string
+export interface Customer {
+    customerId: string
     code: string
     name: string,
-    cnpj: string,
     phone?: string
 }
 
-export const useSupplierStore = defineStore('supplier', {
+export const useCustomerStore = defineStore('customer', {
     state: () => ({
-        suppliers: [] as Supplier[],
+        customers: [] as Customer[],
         loading: false,
         /* --- feedbacks --- */
         error: '' as string | null,
@@ -29,16 +28,15 @@ export const useSupplierStore = defineStore('supplier', {
             this.successVisible = false
         },
         
-        async fetchSuppliers(page = 0, size = 10) {
+        async fetchCustomers(page = 0, size = 10) {
             this.loading = true
             this.clearMessages()
             try {
-                const { data } = await api.get('/supplier', { params: { page, size } })
-                this.suppliers = data.content.map((p: any) => ({
-                    supplierId: p.supplierId,
+                const { data } = await api.get('/customer', { params: { page, size } })
+                this.customers = data.content.map((p: any) => ({
+                    customerId: p.customerId,
                     code: p.code,
                     name: p.name,
-                    cnpj: p.cnpj,
                     phone: p.phone
                 }))
 
@@ -62,20 +60,19 @@ export const useSupplierStore = defineStore('supplier', {
             }
         },
 
-        async addSupplier(supplier: Supplier) {
+        async addCustomer(customer: Customer) {
             this.clearMessages()
             try {
-                const { data } = await api.post('/supplier', supplier)
+                const { data } = await api.post('/customer', customer)
 
-                this.suppliers.push({
-                    supplierId: data.supplierId,
+                this.customers.push({
+                    customerId: data.customerId,
                     code: data.code,
                     name: data.name,
-                    cnpj: data.cnpj,
                     phone: data.phone,
                 })
 
-                this.successMessage = 'Fornecedor cadastrado com sucesso!'
+                this.successMessage = 'Cliente cadastrado com sucesso!'
                 this.successVisible = true
             } catch (error: any) {
                 const data = error?.response?.data
@@ -84,31 +81,30 @@ export const useSupplierStore = defineStore('supplier', {
                         .map((e: any) => e.defaultMessage || e.message || 'Erro desconhecido')
                         .join('\n• ')
                 } else if (data?.errorMessage) {
-                    this.error = 'Erro ao salvar Fornecedor: ' + data.errorMessage
+                    this.error = 'Erro ao salvar Cliente: ' + data.errorMessage
                 } else if (data?.defaultMessage) {
-                    this.error = 'Erro ao salvar Fornecedor: ' + data.defaultMessage
+                    this.error = 'Erro ao salvar Cliente: ' + data.defaultMessage
                 } else if (typeof data === 'string') {
-                    this.error = 'Erro ao salvar Fornecedor: ' + data
+                    this.error = 'Erro ao salvar Cliente: ' + data
                 } else {
-                    this.error = 'Erro ao salvar Fornecedor'
+                    this.error = 'Erro ao salvar Cliente'
                 }
             }
         },
 
-        async updateSupplier(index: number, supplier: Supplier) {
+        async updateCustomer(index: number, customer: Customer) {
             this.clearMessages()
             try {
-                const { data } = await api.put(`/supplier/${supplier.supplierId}`, supplier)
+                const { data } = await api.put(`/customer/${customer.customerId}`, customer)
 
-                this.suppliers[index] = {
-                    supplierId: data.supplierId,
+                this.customers[index] = {
+                    customerId: data.customerId,
                     code: data.code,
                     name: data.name,
-                    cnpj: data.cnpj,
                     phone: data.phone,
                 }
 
-                this.successMessage = 'Fornecedor atualizado com sucesso!'
+                this.successMessage = 'Cliente atualizado com sucesso!'
                 this.successVisible = true
             } catch (error: any) {
                 const data = error?.response?.data
@@ -117,27 +113,27 @@ export const useSupplierStore = defineStore('supplier', {
                         .map((e: any) => e.defaultMessage || e.message || 'Erro desconhecido')
                         .join('\n• ')
                 } else if (data?.errorMessage) {
-                    this.error = 'Erro ao Atualizar Fornecedor: ' + data.errorMessage
+                    this.error = 'Erro ao Atualizar Cliente: ' + data.errorMessage
                 } else if (data?.defaultMessage) {
-                    this.error = 'Erro ao Atualizar Fornecedor: ' + data.defaultMessage
+                    this.error = 'Erro ao Atualizar Cliente: ' + data.defaultMessage
                 } else if (typeof data === 'string') {
-                    this.error = 'Erro ao Atualizar Fornecedor: ' + data
+                    this.error = 'Erro ao Atualizar Cliente: ' + data
                 } else {
-                    this.error = 'Erro ao Atualizar Fornecedor'
+                    this.error = 'Erro ao Atualizar Cliente'
                 }
             }
         },
 
-        async deleteSupplier(index: number) {
+        async deleteCustomer(index: number) {
             this.clearMessages()
 
-            const id = this.suppliers[index].supplierId
+            const id = this.customers[index].customerId
             
             try {
-                await api.delete(`/supplier/${id}`)
-                this.suppliers.splice(index, 1)
+                await api.delete(`/customer/${id}`)
+                this.customers.splice(index, 1)
 
-                this.successMessage = 'Fornecedor excluído com sucesso!'
+                this.successMessage = 'Cliente excluído com sucesso!'
                 this.successVisible = true
             } catch (error: any) {
                 const data = error?.response?.data
@@ -146,13 +142,13 @@ export const useSupplierStore = defineStore('supplier', {
                         .map((e: any) => e.defaultMessage || e.message || 'Erro desconhecido')
                         .join('\n• ')
                 } else if (data?.errorMessage) {
-                    this.error = 'Erro ao Excluir Fornecedor: ' + data.errorMessage
+                    this.error = 'Erro ao Excluir Cliente: ' + data.errorMessage
                 } else if (data?.defaultMessage) {
-                    this.error = 'Erro ao Excluir Fornecedor: ' + data.defaultMessage
+                    this.error = 'Erro ao Excluir Cliente: ' + data.defaultMessage
                 } else if (typeof data === 'string') {
-                    this.error = 'Erro ao Excluir Fornecedor: ' + data
+                    this.error = 'Erro ao Excluir Cliente: ' + data
                 } else {
-                    this.error = 'Erro ao Excluir Fornecedor'
+                    this.error = 'Erro ao Excluir Cliente'
                 }
             }
         },
