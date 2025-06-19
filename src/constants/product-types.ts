@@ -1,4 +1,3 @@
-// product-types.ts
 export const productTypeLabels: Record<string, string> = {
   ELETRONIC: 'Eletrônico',
   HOME_APPLIANCE: 'Eletrodoméstico',

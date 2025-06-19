@@ -1,12 +1,19 @@
 <template>
-  <div>Lucro por Produto – em construção 🚧</div>
+  <PageCard>
+    <v-container fluid>
+      <v-row dense>
+        <v-col cols="16" md="6">
+          <h1>Lucro Por Produto</h1>
+        </v-col>
+      </v-row>
+    </v-container>
+  </PageCard>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
 
-export default defineComponent({
-  name: 'ProductProfit',
-  // props, data, methods…
-})
+<script setup lang="ts">
+import PageCard from '../components/PageCard.vue'
+
 </script>
+
+<style scoped></style>

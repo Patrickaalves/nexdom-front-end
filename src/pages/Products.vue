@@ -3,7 +3,7 @@
     <v-container fluid>
       <h1>Produtos</h1>
 
-      <v-btn @click="showDialog = true" color="primary">Novo Produto</v-btn>
+      <v-btn @click="showDialog = true" color="green-darken-1">Novo Produto</v-btn>
 
       <v-data-table
         :items="products"
