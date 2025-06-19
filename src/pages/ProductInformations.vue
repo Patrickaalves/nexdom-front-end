@@ -1,5 +1,4 @@
 <template>
-  <!-- Cabeçalho ---------------------------------------------------------- -->
   <PageCard class="page-card-main" maxWidth="1000" margin="16px auto">
     <v-container fluid>
       <v-row dense>
@@ -8,7 +7,6 @@
         </v-col>
       </v-row>
 
-      <!-- Campo de pesquisa --------------------------------------------- -->
       <v-row dense align="center" class="mt-4">
         <v-col cols="12" sm="6" md="4">
           <v-text-field
@@ -37,7 +35,6 @@
         </v-col>
       </v-row>
 
-      <!-- Feedbacks ------------------------------------------------------ -->
       <v-row>
         <v-col cols="12">
           <v-alert
@@ -64,40 +61,79 @@
     </v-container>
   </PageCard>
 
-  <!-- Cartão com informações -------------------------------------------- -->
   <div id="product-info-container">
     <PageCard
+      v-if="productInfoStore.productProfit"
       class="info-card"
       maxWidth="600"
-      width="auto"
       margin="0"
       padding="24px"
     >
-      <!-- Dados carregados -->
-      <template v-if="productInfoStore.productProfit">
-        <v-container fluid>
-          <h2 class="title">Lucro por Produto</h2>
+      <v-container fluid>
+        <h2 class="title">Lucro por Produto</h2>
 
-          <div class="info-list">
-            <InfoItem label="Código do Produto"    :value="productInfoStore.productProfit.productCode" />
-            <InfoItem label="Quantidade Vendida"   :value="productInfoStore.productProfit.totalQuantitySold.toLocaleString('pt-BR')" />
-            <InfoItem label="Lucro Total"          :value="formatCurrency(productInfoStore.productProfit.totalProfit)" />
-          </div>
-        </v-container>
-      </template>
-
-      <!-- Placeholder -->
-      <template v-else>
-        <v-container fluid>
-          <v-row justify="center">
-            <v-col cols="12" class="text-center">
-              <v-icon size="64" class="mb-2" color="grey">mdi-package-variant</v-icon>
-              <p>Nenhum produto selecionado.</p>
-            </v-col>
-          </v-row>
-        </v-container>
-      </template>
+        <div class="info-list">
+          <InfoItem
+            label="Código do Produto"
+            :value="productInfoStore.productProfit.productCode"
+          />
+          <InfoItem
+            label="Quantidade Vendida"
+            :value="productInfoStore.productProfit.totalQuantitySold.toLocaleString('pt-BR')"
+          />
+          <InfoItem
+            label="Lucro Total"
+            :value="formatCurrency(productInfoStore.productProfit.totalProfit)"
+          />
+        </div>
+      </v-container>
     </PageCard>
+
+    <PageCard
+      v-if="productInfoStore.productStock"
+      class="info-card"
+      maxWidth="600"
+      margin="0"
+      padding="24px"
+    >
+      <v-container fluid>
+        <h2 class="title">Estoque e Saída</h2>
+
+        <div class="info-list">
+          <InfoItem
+            label="Tipo"
+            :value="productTypeLabels[productInfoStore.productStock.productType] ||
+                    productInfoStore.productStock.productType"
+          />
+          <InfoItem
+            label="Quantidade Saída"
+            :value="productInfoStore.productStock.quantityOut"
+          />
+          <InfoItem
+            label="Quantidade em Estoque"
+            :value="productInfoStore.productStock.stockQuantity"
+          />
+        </div>
+      </v-container>
+    </PageCard>
+
+    <PageCard
+      v-if="!productInfoStore.productProfit && !productInfoStore.productStock"
+      class="info-card"
+      maxWidth="600"
+      margin="0"
+      padding="24px"
+    >
+      <v-container fluid>
+        <v-row justify="center">
+          <v-col cols="12" class="text-center">
+            <v-icon size="64" class="mb-2" color="grey">mdi-package-variant</v-icon>
+            <p>Nenhum produto selecionado.</p>
+          </v-col>
+        </v-row>
+      </v-container>
+    </PageCard>
+
   </div>
 </template>
 
@@ -105,25 +141,26 @@
 import { ref, defineComponent, h, onMounted } from 'vue'
 import PageCard from '../components/PageCard.vue'
 import { useProductInformationStore } from '../store/productinformation'
+import { productTypeLabels } from '../constants/product-types'
 
-/* store ----------------------------------------------------------------- */
+/* store */
 const productInfoStore = useProductInformationStore()
 
-/* ---------- Lifecycle ---------- */
+/* Limpa estado ao montar */
 onMounted(() => {
-  productInfoStore.productProfit = null;
-  productInfoStore.successVisible = false;
-  productInfoStore.error = '';
+  productInfoStore.productProfit = null
+  productInfoStore.productStock  = null
+  productInfoStore.successVisible = false
+  productInfoStore.error = ''
 })
 
-/* campo de pesquisa ----------------------------------------------------- */
+/* Campo de pesquisa */
 const productCode = ref('')
 
 function searchProduct() {
-  productInfoStore.fetchProductProfitByCode(productCode.value.trim())
+  productInfoStore.fetchAllByCode(productCode.value.trim())
 }
 
-/* helper de formatação -------------------------------------------------- */
 function formatCurrency(value: number) {
   return value.toLocaleString('pt-BR', {
     style: 'currency',
@@ -132,7 +169,6 @@ function formatCurrency(value: number) {
   })
 }
 
-/* InfoItem funcional (sem runtime‑compiler) ----------------------------- */
 const InfoItem = defineComponent({
   name: 'InfoItem',
   props: {
@@ -141,20 +177,15 @@ const InfoItem = defineComponent({
   },
   setup(props) {
     return () =>
-      h(
-        'div',
-        { class: 'info-item' },
-        [
-          h('span', { class: 'info-label' }, `${props.label}:`),
-          h('span', { class: 'info-value' }, String(props.value)),
-        ],
-      )
+      h('div', { class: 'info-item' }, [
+        h('span', { class: 'info-label' }, `${props.label}:`),
+        h('span', { class: 'info-value' }, String(props.value)),
+      ])
   },
 })
 </script>
 
 <style scoped>
-/* layout geral */
 #product-info-container {
   display: flex;
   flex-wrap: wrap;
@@ -166,13 +197,17 @@ const InfoItem = defineComponent({
   overflow-x: hidden;
 }
 
-/* cartão principal */
 .info-card {
   flex: 1 1 500px;
-  box-shadow: 0 6px 10px -4px rgba(10, 0, 0, 0.15); /* sombra apenas embaixo */
+  box-shadow: 0 6px 10px -4px rgba(10, 0, 0, 0.15);
 }
 
-/* InfoItem */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .info-item {
   display: flex;
   justify-content: space-between;
@@ -180,10 +215,12 @@ const InfoItem = defineComponent({
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   font-size: 15px;
 }
+
 .info-label {
   font-weight: 600;
   color: #555;
 }
+
 .info-value {
   color: #222;
 }

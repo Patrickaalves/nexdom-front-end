@@ -16,7 +16,7 @@ const props = defineProps<{
   width?: string | number,
   margin?: string,
   padding?: string,
-  styleOverrides?: Record<string, any> // para estilos extras
+  styleOverrides?: Record<string, any>
 }>()
 
 const computedStyle = computed(() => {

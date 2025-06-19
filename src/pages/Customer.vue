@@ -147,7 +147,6 @@ async function save() {
 
   saving.value = false;
 
-  // Fecha o diálogo apenas se não houve erro
   if (!customerStore.error) {
     showDialog.value = false
     resetForm()
@@ -183,7 +182,6 @@ function cancel() {
   isEditing.value = false
 }
 
-
 /* ---------- Functions ---------- */
 const rules = {
   required: (v: string) => !!v || 'Campo obrigatório',
@@ -212,11 +210,9 @@ function isFormValid(): boolean {
   return codeOk && nameOk && phoneOk
 }
 
-
 </script>
 
 <style scoped>
-/* Diminuir largura da coluna ação e centralizar */
 .v-data-table__wrapper table th:nth-child(5),
 .v-data-table__wrapper table td:nth-child(5) {
   width: 100px !important;
@@ -225,7 +221,6 @@ function isFormValid(): boolean {
   vertical-align: middle !important;
 }
 
-/* Ajustar botões na coluna ação para serem menores e menos padding */
 .action-btn {
   padding: 0px !important;
   margin: 8px 2px;

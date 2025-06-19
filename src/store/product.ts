@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { api } from '../api/http'
 import type { ProductType } from '../constants/product-types'
 
-/* ---------- Tipos ---------- */
+/*  Tipos  */
 export interface Product {
   productId: string
   code: string
@@ -12,20 +12,20 @@ export interface Product {
   stockQuantity: number
 }
 
-/* ---------- Store ---------- */
+/*  Store  */
 export const useProductStore = defineStore('product', {
   state: () => ({
     products: [] as Product[],
 
     loading: false,
 
-    /* --- feedbacks --- */
+    /*  feedbacks  */
     error: '' as string | null,
 
     successMessage: '' as string | null,
     successVisible: false,
 
-    /* --- paginação --- */
+    /*  paginação  */
     page: 0,
     totalPages: 0,
   }),
@@ -38,7 +38,7 @@ export const useProductStore = defineStore('product', {
       this.successVisible = false
     },
 
-    /* -------- CRUD -------- */
+    /* -- CRUD -- */
     async fetchProducts(page = 0, size = 10) {
       this.loading = true
       this.clearMessages()

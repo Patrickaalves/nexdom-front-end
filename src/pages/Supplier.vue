@@ -102,17 +102,17 @@ import { ref, reactive, computed, onMounted, toRaw, watch } from 'vue'
 import {useSupplierStore, type Supplier } from '../store/supplier'
 import PageCard from '../components/PageCard.vue'
 
-/* ---------- Store ---------- */
+/*  Store  */
 const supplierStore = useSupplierStore()
 
-/* ---------- Estado local ---------- */
+/*  Estado local  */
 const showDialog = ref(false)
 const showError  = ref(false)
 const isEditing  = ref(false)
 const editIndex  = ref(-1)
 const saving     = ref(false)
 
-/* ---------- Cabeçalhos ---------- */
+/*  Cabeçalhos  */
 const headers = [
   { title: 'Código',          key: 'code' },
   { title: 'Nome',            key: 'name' },
@@ -121,7 +121,7 @@ const headers = [
   { title: 'Ação',            key: 'action', sortable: false },
 ]
 
-/* ---------- Computeds ---------- */
+/*  Computeds  */
 const suppliers = computed(() => supplierStore.suppliers)
 
 const form = reactive<Supplier>({
@@ -140,12 +140,12 @@ function resetForm() {
   form.phone      = ''
 }
 
-/* ---------- Lifecycle ---------- */
+/*  Lifecycle  */
 onMounted(() => {
   supplierStore.fetchSuppliers()
 })
 
-/* ---------- Ações UI ---------- */
+/*  Ações UI  */
 
 async function save() {
   saving.value = true;
@@ -185,7 +185,7 @@ async function deleteSupplier(index: number) {
   await supplierStore.deleteSupplier(index)
 }
 
-/* ---------- Watchers ---------- */
+/*  Watchers  */
 watch(() => supplierStore.error, (newVal) => {
   if (newVal) showError.value = true
 })
@@ -197,7 +197,7 @@ function cancel() {
 }
 
 
-/* ---------- Functions ---------- */
+/*  Functions  */
 function formatCNPJ(value: string): string {
   if (!value) return ''
   return value
@@ -242,7 +242,6 @@ function isFormValid(): boolean {
 </script>
 
 <style scoped>
-/* Diminuir largura da coluna ação e centralizar */
 .v-data-table__wrapper table th:nth-child(5),
 .v-data-table__wrapper table td:nth-child(5) {
   width: 100px !important;
@@ -251,7 +250,6 @@ function isFormValid(): boolean {
   vertical-align: middle !important;
 }
 
-/* Ajustar botões na coluna ação para serem menores e menos padding */
 .action-btn {
   padding: 0px !important;
   margin: 8px 2px;

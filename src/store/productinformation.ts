@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from '../api/http'
 
+/*  Tipos  */
 export interface ProductProfit {
   productId:         string
   productCode:       string
@@ -8,9 +9,19 @@ export interface ProductProfit {
   totalProfit:       number
 }
 
+export interface ProductStock {
+  productId:      string
+  productCode:    string
+  productType:    string
+  quantityOut:    number
+  stockQuantity:  number
+}
+
+/*  Store  */
 export const useProductInformationStore = defineStore('productInformations', {
   state: () => ({
     productProfit: null as ProductProfit | null,
+    productStock:  null as ProductStock  | null,
     loading: false,
 
     /* feedbacks */
@@ -26,8 +37,33 @@ export const useProductInformationStore = defineStore('productInformations', {
       this.successVisible = false
     },
 
-    /** Busca lucro de produto pelo CÓDIGO */
+    /* -- Lucro -- */
     async fetchProductProfitByCode(productCode: string) {
+      try {
+        const { data } = await api.get(`/product/profit-product/${productCode}`)
+        this.productProfit = {
+          productId: data.productId,
+          productCode: data.productCode,
+          totalQuantitySold: data.totalQuantitySold,
+          totalProfit: data.totalProfit,
+        }
+      } catch (e) {
+        throw new Error('Erro ao buscar lucro do produto')
+      }
+    },
+
+    /* -- Estoque / saída --- */
+    async fetchProductStockByCode(productCode: string) {
+      try {
+        const { data } = await api.get(`/product/find-products-type/${productCode}`)
+        this.productStock = data     // já tem exatamente os mesmos campos
+      } catch (e) {
+        throw new Error('Erro ao buscar estoque do produto')
+      }
+    },
+
+    /* -- Função única para a página  */
+    async fetchAllByCode(productCode: string) {
       if (!productCode) {
         this.error = 'Informe o código do produto'
         return
@@ -36,28 +72,15 @@ export const useProductInformationStore = defineStore('productInformations', {
       this.loading = true
       this.clearMessages()
       try {
-        const { data } = await api.get(`product/profit-product/${productCode}`)
-        this.productProfit = {
-          productId: data.productId,
-          productCode: data.productCode,
-          totalQuantitySold: data.totalQuantitySold,
-          totalProfit: data.totalProfit,
-        }
+        await Promise.all([
+          this.fetchProductProfitByCode(productCode),
+          this.fetchProductStockByCode(productCode),
+        ])
+
         this.successMessage = 'Dados carregados com sucesso!'
         this.successVisible = true
-      } catch (error: any) {
-        const data = error?.response?.data
-        if (Array.isArray(data)) {
-          this.error = data
-            .map((e: any) => e.defaultMessage || e.message || 'Erro desconhecido')
-            .join('\n• ')
-        } else if (data?.errorMessage) {
-          this.error = 'Erro ao buscar lucro do produto: ' + data.errorMessage
-        } else if (typeof data === 'string') {
-          this.error = 'Erro ao buscar lucro do produto: ' + data
-        } else {
-          this.error = 'Erro ao buscar lucro do produto'
-        }
+      } catch (err: any) {
+        this.error = err.message || 'Erro ao buscar dados'
       } finally {
         this.loading = false
       }

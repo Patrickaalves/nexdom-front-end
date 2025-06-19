@@ -137,19 +137,19 @@ import { operationTypeLabels } from '../constants/operation-type'
 import PageCard from '../components/PageCard.vue'
 import { format } from 'date-fns'
 
-/* ---------- Store ---------- */
+/*  Store  */
 const stockMovementStore = useStockMovementStore()
 const customerStore = useCustomerStore()
 const productStore = useProductStore()
 
-/* ---------- Estado local ---------- */
+/*  Estado local  */
 const showDialog = ref(false)
 const editIndex  = ref(-1)
 
 const showError  = ref(false)
 const saving     = ref(false)
 
-/* ---------- Cabeçalhos ---------- */
+/*  Cabeçalhos  */
 const headers = [
   { title: 'Código do Produto',      key: 'productCode' },
   { title: 'Cliente',                key: 'customerId' },
@@ -160,7 +160,7 @@ const headers = [
   { title: 'Ação',                   key: 'action', sortable: false},
 ]
 
-/* ---------- Computeds ---------- */
+/*  Computeds  */
 const stockMovements = computed(() => stockMovementStore.stockMovements)
 
 const productOptions = computed(() =>
@@ -187,7 +187,7 @@ const customerById = computed(() =>
   )
 )
 
-/* ---------- Formulário ---------- */
+/*  Formulário  */
 const form = reactive<StockMovement>({
   stockMovementId:  '',
   productId:        '',
@@ -210,7 +210,7 @@ function resetForm() {
   form.productCode      = ''
 }
 
-/* ---------- Lifecycle ---------- */
+/*  Lifecycle  */
 onMounted(() => {
   stockMovementStore.fetchStockMovements()
   if (customerStore.customers.length === 0) {
@@ -221,18 +221,18 @@ onMounted(() => {
   }
 })
 
-/* ---------- Ações UI ---------- */
+/*  Ações UI  */
 async function save() {
   saving.value = true
 
   const stockMovement = toRaw(form)
 
   if (form.saleDate) {
-    const now   = new Date()                     // hora atual
+    const now   = new Date()
     const hh    = String(now.getHours()).padStart(2, '0')
     const mm    = String(now.getMinutes()).padStart(2, '0')
 
-    form.saleDate = `${form.saleDate}T${hh}:${mm}:00` // "YYYY-MM-DDTHH:MM:00"
+    form.saleDate = `${form.saleDate}T${hh}:${mm}:00`
   }
   await stockMovementStore.addStockMovement(stockMovement)
 
@@ -279,14 +279,13 @@ function formatDate(dateStr: string): string {
   return format(date, 'dd/MM/yyyy HH:mm')
 }
 
-/* ---------- Watchers ---------- */
+/*  Watchers  */
 watch(() => stockMovementStore.error, (newVal) => {
   if (newVal) showError.value = true
 })
 </script>
 
 <style scoped>
-/* Diminuir largura da coluna ação e centralizar */
 .v-data-table__wrapper table th:nth-child(5),
 .v-data-table__wrapper table td:nth-child(5) {
   width: 100px !important;
@@ -295,7 +294,6 @@ watch(() => stockMovementStore.error, (newVal) => {
   vertical-align: middle !important;
 }
 
-/* Ajustar botões na coluna ação para serem menores e menos padding */
 .action-btn {
   padding: 0px !important;
   margin: 8px 2px;

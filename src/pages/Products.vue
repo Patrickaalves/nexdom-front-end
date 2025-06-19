@@ -5,8 +5,31 @@
 
       <v-btn @click="showDialog = true" color="green-darken-1">Novo Produto</v-btn>
 
+      <v-row dense align="center" class="mt-4">
+        <v-col cols="12" sm="4" md="3">
+          <v-select
+            v-model="searchField"
+            :items="searchFieldItems"
+            label="Filtrar por"
+            hide-details
+            density="comfortable"
+          />
+        </v-col>
+
+        <v-col cols="12" sm="8" md="3">
+          <v-text-field
+            v-model="searchQuery"
+            label="Pesquisar"
+            prepend-inner-icon="mdi-magnify"
+            clearable
+            hide-details
+            density="comfortable"
+          />
+        </v-col>
+      </v-row>
+
       <v-data-table
-        :items="products"
+        :items="filteredProducts"
         :headers="headers"
         fixed-header
         height="570"
@@ -123,11 +146,11 @@ import { useProductStore, type Product } from '../store/product'
 import { useSupplierStore } from '../store/supplier'
 import PageCard from '../components/PageCard.vue'
 
-/* ---------- Store ---------- */
+/*  Store  */
 const productStore = useProductStore()
 const supplierStore = useSupplierStore()
 
-/* ---------- Estado local ---------- */
+/*  Estado local  */
 const showDialog = ref(false)
 const isEditing  = ref(false)
 const editIndex  = ref(-1)
@@ -135,7 +158,51 @@ const editIndex  = ref(-1)
 const showError  = ref(false)
 const saving     = ref(false)
 
-/* ---------- Cabeçalhos ---------- */
+/*  Filtro de pesquisa  */
+const searchField = ref<'code' | 'productType' | 'supplier' | 'supplierPrice' | 'stockQuantity'>('code')
+const searchQuery = ref('')
+
+const searchFieldItems = [
+  { value: 'code',          title: 'Código' },
+  { value: 'productType',   title: 'Tipo' },
+  { value: 'supplier',      title: 'Fornecedor' },
+  { value: 'supplierPrice', title: 'Preço Fornecedor' },
+  { value: 'stockQuantity', title: 'Qtd. Estoque' },
+]
+
+/*  Produtos filtrados  */
+const filteredProducts = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return productStore.products
+
+  return productStore.products.filter(p => {
+    switch (searchField.value) {
+      case 'code':
+        return p.code?.toLowerCase().includes(q)
+
+      case 'productType':
+        return productTypeLabels[p.productType]
+          ?.toLowerCase()
+          .includes(q)
+
+      case 'supplier':
+        return supplierById.value[p.supplier]
+          ?.toLowerCase()
+          .includes(q)
+
+      case 'supplierPrice':
+        return String(p.supplierPrice).includes(q)
+
+      case 'stockQuantity':
+        return String(p.stockQuantity).includes(q)
+
+      default:
+        return true
+    }
+  })
+})
+
+/*  Cabeçalhos  */
 const headers = [
   { title: 'Código',           key: 'code' },
   { title: 'Tipo',             key: 'productType' },
@@ -145,7 +212,7 @@ const headers = [
   { title: 'Ação',             key: 'action', sortable: false },
 ]
 
-/* ---------- Computeds ---------- */
+/*  Computeds  */
 const products = computed(() => productStore.products)
 
 const typeItems = computed(() =>
@@ -165,7 +232,7 @@ const supplierById = computed(() =>
   )
 )
 
-/* ---------- Formulário ---------- */
+/*  Formulário  */
 const form = reactive<Product>({
   productId: undefined,
   code: '',
@@ -184,7 +251,7 @@ function resetForm() {
   form.stockQuantity = 0
 }
 
-/* ---------- Lifecycle ---------- */
+/*  Lifecycle  */
 onMounted(() => {
   productStore.fetchProducts()
   if (supplierStore.suppliers.length === 0) {
@@ -192,7 +259,7 @@ onMounted(() => {
   }
 })
 
-/* ---------- Ações UI ---------- */
+/*  Ações UI  */
 async function save() {
   saving.value = true
 
@@ -207,7 +274,6 @@ async function save() {
 
   saving.value = false
 
-  // Fecha o diálogo apenas se não houve erro
   if (!productStore.error) {
     showDialog.value = false
     resetForm()
@@ -244,14 +310,13 @@ function truncate2(value: number): number {
   return Math.trunc(value * 100) / 100
 }
 
-/* ---------- Watchers ---------- */
+/*  Watchers  */
 watch(() => productStore.error, (newVal) => {
   if (newVal) showError.value = true
 })
 </script>
 
 <style scoped>
-/* Diminuir largura da coluna ação e centralizar */
 .v-data-table__wrapper table th:nth-child(5),
 .v-data-table__wrapper table td:nth-child(5) {
   width: 100px !important;
@@ -260,7 +325,6 @@ watch(() => productStore.error, (newVal) => {
   vertical-align: middle !important;
 }
 
-/* Ajustar botões na coluna ação para serem menores e menos padding */
 .action-btn {
   padding: 0px !important;
   margin: 8px 2px;
