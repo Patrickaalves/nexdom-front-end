@@ -93,7 +93,11 @@
         <v-card>
           <v-card-title>{{ isEditing ? 'Editar Produto' : 'Novo Produto' }}</v-card-title>
           <v-card-text>
-            <v-text-field v-model="form.code" label="Código" />
+            <v-text-field
+              v-model="form.code"
+              label="Código"
+              :rules="[rules.required]"
+            />
 
             <v-select
               v-model="form.productType"
@@ -101,7 +105,7 @@
               item-title="title"
               item-value="value"
               label="Tipo Produto"
-              :rules="[v => !!v || 'Tipo é obrigatório']"
+              :rules="[rules.required]"
             />
 
             <v-select
@@ -110,6 +114,7 @@
               item-title="title"
               item-value="value"
               label="Fornecedor"
+              :rules="[rules.required]"
               :disabled="isEditing"
               :return-object="false"
               :loading="supplierStore.loading"
@@ -120,12 +125,15 @@
               label="Valor Fornecedor"
               type="number"
               step="0.01"
+              :rules="[rules.required, rules.positiveNumber]"
               @blur="form.supplierPrice = truncate2(form.supplierPrice)"
             />
+
             <v-text-field
               v-model.number="form.stockQuantity"
               label="Quantidade Estoque"
               type="number"
+              :rules="[rules.required, rules.positiveNumber]"
             />
           </v-card-text>
 
@@ -308,6 +316,11 @@ function cancel() {
 
 function truncate2(value: number): number {
   return Math.trunc(value * 100) / 100
+}
+
+const rules = {
+  required: (v: any) => (v !== null && v !== undefined && v !== '') || 'Campo obrigatório',
+  positiveNumber: (v: number) => v > 0 || 'Deve ser maior que zero',
 }
 
 /*  Watchers  */

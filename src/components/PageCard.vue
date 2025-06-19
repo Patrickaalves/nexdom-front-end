@@ -22,7 +22,7 @@ const props = defineProps<{
 const computedStyle = computed(() => {
   const styles: Record<string, string> = {
     margin: props.margin ?? '24px auto',
-    padding: props.padding ?? '24px',
+    padding: props.padding ?? '18px',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     maxWidth: props.maxWidth ? (typeof props.maxWidth === 'number' ? `${props.maxWidth}px` : props.maxWidth) : '1800px',

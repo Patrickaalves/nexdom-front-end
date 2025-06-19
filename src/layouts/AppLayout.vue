@@ -6,7 +6,7 @@
       dark
       style="flex-direction: column; align-items: flex-start; padding-left: 16px; padding-bottom: 8px;"
     >
-      <div style="display: flex; align-items: center; width: 47%;">
+      <div style="display: flex; align-items: center; width: 45%;">
         <v-app-bar-nav-icon @click="drawer = !drawer" />
         <v-toolbar-title style="margin-left: 8px;">Controle de Estoque</v-toolbar-title>
       </div>
