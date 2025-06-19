@@ -7,6 +7,7 @@ export interface Product {
   productId: string
   code: string
   productType: ProductType
+  supplier: string
   supplierPrice: number
   stockQuantity: number
 }
@@ -48,6 +49,7 @@ export const useProductStore = defineStore('product', {
           productId: p.productId,
           code: p.code,
           productType: p.productType,
+          supplier: p.supplier,
           supplierPrice: p.supplierPrice,
           stockQuantity: p.stockQuantity,
         }))
@@ -70,6 +72,7 @@ export const useProductStore = defineStore('product', {
           productId: data.productId,
           code: data.code,
           productType: data.productType,
+          supplier: data.supplier,
           supplierPrice: data.supplierPrice,
           stockQuantity: data.stockQuantity,
         })
@@ -96,13 +99,16 @@ export const useProductStore = defineStore('product', {
     async updateProduct(index: number, product: Product) {
       this.clearMessages();
 
+      const { supplier, ...payload } = product
+
       try {
-        const { data } = await api.put(`/product/${product.productId}`, product)
+        const { data } = await api.put(`/product/${product.productId}`, payload)
 
         this.products[index] = {
           productId: data.productId,
           code: data.code,
           productType: data.productType,
+          supplier: data.supplier,
           supplierPrice: data.supplierPrice,
           stockQuantity: data.stockQuantity,
         }

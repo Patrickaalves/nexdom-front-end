@@ -26,13 +26,13 @@
           </v-data-table>
 
           <v-snackbar 
-            v-model="store.successVisible" 
+            v-model="supplierStore.successVisible" 
             :timeout="3000" 
             color="success" 
             location="top right"
-            @update:model-value="val => { if (!val) store.successVisible = false }"
+            @update:model-value="val => { if (!val) supplierStore.successVisible = false }"
           >
-            <span class="text-center w-100">{{ store.successMessage }}</span>
+            <span class="text-center w-100">{{ supplierStore.successMessage }}</span>
           </v-snackbar>
 
           <v-snackbar
@@ -40,9 +40,9 @@
             :timeout="5000"
             color="error"
             top
-            @update:model-value="val => { if (!val) store.error = null }"
+            @update:model-value="val => { if (!val) supplierStore.error = null }"
           >
-            <span class="text-center w-100">{{ store.error }}</span>
+            <span class="text-center w-100">{{ supplierStore.error }}</span>
           </v-snackbar>
 
           <v-dialog v-model="showDialog" max-width="500">
@@ -99,11 +99,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, toRaw, watch } from 'vue'
-import {useSupplierStore, type Supplier } from '../store/Supplier'
+import {useSupplierStore, type Supplier } from '../store/supplier'
 import PageCard from '../components/PageCard.vue'
 
 /* ---------- Store ---------- */
-const store = useSupplierStore()
+const supplierStore = useSupplierStore()
 
 /* ---------- Estado local ---------- */
 const showDialog = ref(false)
@@ -122,7 +122,7 @@ const headers = [
 ]
 
 /* ---------- Computeds ---------- */
-const suppliers = computed(() => store.suppliers)
+const suppliers = computed(() => supplierStore.suppliers)
 
 const form = reactive<Supplier>({
   supplierId: undefined,
@@ -142,7 +142,7 @@ function resetForm() {
 
 /* ---------- Lifecycle ---------- */
 onMounted(() => {
-  store.fetchSuppliers()
+  supplierStore.fetchSuppliers()
 })
 
 /* ---------- Ações UI ---------- */
@@ -152,15 +152,15 @@ async function save() {
   const supplier = toRaw(form)
 
   if (isEditing.value) {
-    await store.updateSupplier(editIndex.value, supplier)
+    await supplierStore.updateSupplier(editIndex.value, supplier)
   } else {
-    await store.addSupplier(supplier)
+    await supplierStore.addSupplier(supplier)
   }
 
   saving.value = false;
 
   // Fecha o diálogo apenas se não houve erro
-  if (!store.error) {
+  if (!supplierStore.error) {
     showDialog.value = false
     resetForm()
     isEditing.value  = false
@@ -168,7 +168,7 @@ async function save() {
 }
 
 function editSupplier(index: number) {
-  const p = store.suppliers[index]
+  const p = supplierStore.suppliers[index]
 
   form.supplierId = p.supplierId
   form.code       = p.code
@@ -182,11 +182,11 @@ function editSupplier(index: number) {
 }
 
 async function deleteSupplier(index: number) {
-  await store.deleteSupplier(index)
+  await supplierStore.deleteSupplier(index)
 }
 
 /* ---------- Watchers ---------- */
-watch(() => store.error, (newVal) => {
+watch(() => supplierStore.error, (newVal) => {
   if (newVal) showError.value = true
 })
 

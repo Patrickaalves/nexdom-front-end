@@ -18,6 +18,10 @@
           {{ productTypeLabels[item.productType] }}
         </template>
 
+        <template #item.supplier="{ item }">
+          {{ supplierById[item.supplier] ?? '—' }}
+        </template>
+
         <!-- Coluna Preço Fornecedor -->
         <template #item.supplierPrice="{ item }">
           {{ truncate2(item.supplierPrice).toFixed(2).replace('.', ',') }}
@@ -41,13 +45,13 @@
 
       <!-- Snackbar de sucesso -->
       <v-snackbar
-        v-model="store.successVisible"
+        v-model="productStore.successVisible"
         :timeout="3000"
         color="success"
         location="top right"
-        @update:model-value="val => { if (!val) store.successVisible = false }"
+        @update:model-value="val => { if (!val) productStore.successVisible = false }"
       >
-        <span class="text-center w-100">{{ store.successMessage }}</span>
+        <span class="text-center w-100">{{ productStore.successMessage }}</span>
       </v-snackbar>
 
       <!-- Snackbar de erro -->
@@ -56,9 +60,9 @@
         :timeout="5000"
         color="error"
         top
-        @update:model-value="val => { if (!val) store.error = null }"
+        @update:model-value="val => { if (!val) productStore.error = null }"
       >
-        <span class="text-center w-100">{{ store.error }}</span>
+        <span class="text-center w-100">{{ productStore.error }}</span>
       </v-snackbar>
 
       <!-- Formulário -->
@@ -75,6 +79,17 @@
               item-value="value"
               label="Tipo Produto"
               :rules="[v => !!v || 'Tipo é obrigatório']"
+            />
+
+            <v-select
+              v-model="form.supplier"
+              :items="supplierOptions"
+              item-title="title"
+              item-value="value"
+              label="Fornecedor"
+              :disabled="isEditing"
+              :return-object="false"
+              :loading="supplierStore.loading"
             />
 
             <v-text-field
@@ -105,10 +120,12 @@
 import { ref, reactive, computed, onMounted, toRaw, watch } from 'vue'
 import { productTypeLabels } from '../constants/product-types'
 import { useProductStore, type Product } from '../store/product'
+import { useSupplierStore } from '../store/supplier'
 import PageCard from '../components/PageCard.vue'
 
 /* ---------- Store ---------- */
-const store = useProductStore()
+const productStore = useProductStore()
+const supplierStore = useSupplierStore()
 
 /* ---------- Estado local ---------- */
 const showDialog = ref(false)
@@ -120,18 +137,32 @@ const saving     = ref(false)
 
 /* ---------- Cabeçalhos ---------- */
 const headers = [
-  { title: 'Código',          key: 'code' },
-  { title: 'Tipo',            key: 'productType' },
-  { title: 'Preço Fornecedor',key: 'supplierPrice' },
-  { title: 'Qtd. Estoque',    key: 'stockQuantity' },
-  { title: 'Ação',            key: 'action', sortable: false },
+  { title: 'Código',           key: 'code' },
+  { title: 'Tipo',             key: 'productType' },
+  { title: 'Preço Fornecedor', key: 'supplierPrice' },
+  { title: 'Fornecedor',       key: 'supplier' },
+  { title: 'Qtd. Estoque',     key: 'stockQuantity' },
+  { title: 'Ação',             key: 'action', sortable: false },
 ]
 
 /* ---------- Computeds ---------- */
-const products = computed(() => store.products)
+const products = computed(() => productStore.products)
 
 const typeItems = computed(() =>
   Object.entries(productTypeLabels).map(([value, title]) => ({ value, title })),
+)
+
+const supplierOptions = computed(() =>
+  supplierStore.suppliers.map(s => ({
+    title: `${s.name}`,   
+    value: s.supplierId
+  }))
+)
+
+const supplierById = computed(() =>
+  Object.fromEntries(
+    supplierStore.suppliers.map(s => [s.supplierId, s.name])
+  )
 )
 
 /* ---------- Formulário ---------- */
@@ -139,6 +170,7 @@ const form = reactive<Product>({
   productId: undefined,
   code: '',
   productType: 'ELETRONIC',
+  supplier: undefined,
   supplierPrice: 0,
   stockQuantity: 0,
 })
@@ -147,13 +179,17 @@ function resetForm() {
   form.productId     = undefined
   form.code          = ''
   form.productType   = 'ELETRONIC'
+  form.supplier    = undefined
   form.supplierPrice = 0
   form.stockQuantity = 0
 }
 
 /* ---------- Lifecycle ---------- */
 onMounted(() => {
-  store.fetchProducts()
+  productStore.fetchProducts()
+  if (supplierStore.suppliers.length === 0) {
+    supplierStore.fetchSuppliers()
+  }
 })
 
 /* ---------- Ações UI ---------- */
@@ -164,15 +200,15 @@ async function save() {
   const product = toRaw(form)
 
   if (isEditing.value) {
-    await store.updateProduct(editIndex.value, product)
+    await productStore.updateProduct(editIndex.value, product)
   } else {
-    await store.addProduct(product)
+    await productStore.addProduct(product)
   }
 
   saving.value = false
 
   // Fecha o diálogo apenas se não houve erro
-  if (!store.error) {
+  if (!productStore.error) {
     showDialog.value = false
     resetForm()
     isEditing.value  = false
@@ -180,11 +216,12 @@ async function save() {
 }
 
 function editProduct(index: number) {
-  const p = store.products[index]
+  const p = productStore.products[index]
 
   form.productId     = p.productId
   form.code          = p.code
   form.productType   = p.productType
+  form.supplier      = p.supplier
   form.supplierPrice = p.supplierPrice
   form.stockQuantity = p.stockQuantity
 
@@ -194,7 +231,7 @@ function editProduct(index: number) {
 }
 
 async function deleteProduct(index: number) {
-  await store.deleteProduct(index)
+  await productStore.deleteProduct(index)
 }
 
 function cancel() {
@@ -208,7 +245,7 @@ function truncate2(value: number): number {
 }
 
 /* ---------- Watchers ---------- */
-watch(() => store.error, (newVal) => {
+watch(() => productStore.error, (newVal) => {
   if (newVal) showError.value = true
 })
 </script>
