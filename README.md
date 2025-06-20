@@ -26,13 +26,14 @@ Esta aplicação é responsável pela interface do usuário, consumindo a API ba
 ## Pré-requisitos
 
 - Node.js (>= 18.x)  
-- npm ou yarn  
+- npm
 
 ---
 
 ## Como rodar localmente
+1. Ter subido a aplicação back-end: https://github.com/Patrickaalves/nexdom-back-end
 
-1. Clone este repositório:
+2. Clone e rodar o repositorio
 
    ```bash
    git clone https://github.com/Patrickaalves/nexdom-front-end.git
