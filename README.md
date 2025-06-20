@@ -38,4 +38,5 @@ Esta aplicação é responsável pela interface do usuário, consumindo a API ba
    ```bash
    git clone https://github.com/Patrickaalves/nexdom-front-end.git
    cd nexdom-front-end
+   npm install
    npm run dev
