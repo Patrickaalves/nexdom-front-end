@@ -5,6 +5,7 @@ export interface StockMovementCreate {
   productId: string
   operationType: OperationType
   salePrice: number
+  costPrice: number 
   saleDate: string // "yyyy-MM-ddTHH:mm:ss"
   movementQuantity: number
   customerId?: string

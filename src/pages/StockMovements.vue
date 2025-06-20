@@ -7,7 +7,6 @@
         Novo Movimento de estoque
       </v-btn>
 
-      <!-- Tabela ------------------------------------------------------- -->
       <v-data-table
         :items="stockMovements"
         :headers="headers"
@@ -16,12 +15,10 @@
         class="mt-2"
         style="max-width: 90%;"
       >
-        <!-- Data formatada -->
         <template #item.saleDate="{ item }">
           {{ formatDate(item.saleDate) }}
         </template>
 
-        <!-- Participante (cliente ou fornecedor) -->
         <template #item.participant="{ item }">
           {{
             item.operationType === 'ENTRY'
@@ -30,12 +27,10 @@
           }}
         </template>
 
-        <!-- Tipo (label amigável) -->
         <template #item.operationType="{ item }">
           {{ operationTypeLabels[item.operationType] }}
         </template>
 
-        <!-- Ações -->
         <template #item.action="{ index }">
           <v-btn
             icon
@@ -48,13 +43,11 @@
           </v-btn>
         </template>
 
-        <!-- Cabeçalho da coluna de ação -->
         <template #header.action>
           <th style="width: 50px; font-weight: 100;">Ação</th>
         </template>
       </v-data-table>
 
-      <!-- Snackbars ---------------------------------------------------- -->
       <v-snackbar
         v-model="stockMovementStore.successVisible"
         :timeout="3000"
@@ -75,14 +68,12 @@
         <span class="text-center w-100">{{ stockMovementStore.error }}</span>
       </v-snackbar>
 
-      <!-- Diálogo / Formulário ---------------------------------------- -->
       <v-dialog v-model="showDialog" max-width="500">
         <v-card>
           <v-card-title>Novo Movimento de estoque</v-card-title>
 
           <v-card-text>
             <v-form ref="formRef" v-model="formValid" lazy-validation>
-              <!-- Tipo de operação -->
               <v-select
                 v-model="form.operationType"
                 :items="operationTypeItems"
@@ -94,7 +85,6 @@
                 @update:model-value="onOperationTypeChange"
               />
 
-              <!-- Produto -->
               <v-select
                 v-model="form.productId"
                 :items="productOptions"
@@ -106,7 +96,6 @@
                 required
               />
 
-              <!-- Cliente ou Fornecedor (condicional) -->
               <v-select
                 v-if="isEntry"
                 v-model="form.supplierId"
@@ -129,18 +118,30 @@
                 :rules="[rules.required]"
                 required
               />
-              
+
+              <!-- Preço de venda com validação condicional -->
               <v-text-field
+                v-if="!isEntry"
                 v-model.number="form.salePrice"
-                label="Preço"
+                label="Preço de Venda"
                 type="number"
                 step="0.01"
                 @blur="form.salePrice = truncate2(form.salePrice)"
+                :rules="!isEntry ? [rules.required, rules.positiveNumber] : []"
+                required
+              />
+
+              <!-- Preço de custo sempre obrigatório -->
+              <v-text-field
+                v-model.number="form.costPrice"
+                label="Preço de Custo"
+                type="number"
+                step="0.01"
+                @blur="form.costPrice = truncate2(form.costPrice)"
                 :rules="[rules.required, rules.positiveNumber]"
                 required
               />
 
-              <!-- Quantidade -->
               <v-text-field
                 v-model.number="form.movementQuantity"
                 label="Quantidade Movimentada"
@@ -149,10 +150,9 @@
                 required
               />
 
-              <!-- Data -->
               <v-text-field
                 v-model="form.saleDate"
-                label="Data de Venda"
+                label="Data"
                 type="date"
                 :rules="[rules.required]"
                 required
@@ -238,6 +238,7 @@ const form = reactive<StockMovementCreate>({
   productId: '',
   operationType: undefined as any,
   salePrice: 0,
+  costPrice: 0,
   saleDate: '',
   movementQuantity: 0,
   customerId: undefined,
@@ -258,6 +259,14 @@ const rules = {
   required: (v: any) => !!v || 'Campo obrigatório',
   positiveNumber: (v: number) => v > 0 || 'Deve ser maior que zero',
   positiveInteger: (v: number) => Number.isInteger(v) && v > 0 || 'Deve ser um número inteiro positivo',
+
+  salePriceRule: (v: number) => {
+    if (isEntry.value) {
+      return (v === 0 || v === null || v === undefined) || 'Preço de venda deve ser nulo ou zero para entrada'
+    } else {
+      return (v > 0) || 'Preço de venda é obrigatório e deve ser maior que zero para saída'
+    }
+  }
 }
 
 onMounted(() => {
@@ -276,6 +285,10 @@ async function save() {
     const hh = now.getHours().toString().padStart(2, '0')
     const mm = now.getMinutes().toString().padStart(2, '0')
     form.saleDate = `${form.saleDate}T${hh}:${mm}:00`
+  }
+
+  if (form.operationType === 'ENTRY') {
+    form.salePrice = P
   }
 
   await stockMovementStore.addStockMovement(toRaw(form))
@@ -301,6 +314,7 @@ function resetForm() {
     productId: '',
     operationType: undefined,
     salePrice: 0,
+    costPrice: 0,
     saleDate: '',
     movementQuantity: 0,
     customerId: undefined,

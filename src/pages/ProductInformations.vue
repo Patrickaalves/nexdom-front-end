@@ -77,9 +77,16 @@
             label="Código do Produto"
             :value="productInfoStore.productProfit.productCode"
           />
-          <InfoItem
+
+         <InfoItem
             label="Quantidade Vendida"
-            :value="productInfoStore.productProfit.totalQuantitySold.toLocaleString('pt-BR')"
+            :value="productInfoStore.productProfit?.totalQuantitySold
+              ? productInfoStore.productProfit.totalQuantitySold.toLocaleString('pt-BR')
+              : '' "
+          />
+          <InfoItem
+            label="Valor Bruto"
+            :value="formatCurrency(productInfoStore.productProfit.totalGrossRevenue)"
           />
           <InfoItem
             label="Lucro Total"
