@@ -131,15 +131,14 @@
                 required
               />
 
-              <!-- Preço de custo sempre obrigatório -->
               <v-text-field
                 v-model.number="form.costPrice"
                 label="Preço de Custo"
                 type="number"
                 step="0.01"
                 @blur="form.costPrice = truncate2(form.costPrice)"
-                :rules="[rules.required, rules.positiveNumber]"
-                required
+                :rules="isEntry ? [rules.positiveNumber] : []"
+                :required="!isEntry"
               />
 
               <v-text-field
@@ -288,7 +287,7 @@ async function save() {
   }
 
   if (form.operationType === 'ENTRY') {
-    form.salePrice = P
+    form.salePrice = 0
   }
 
   await stockMovementStore.addStockMovement(toRaw(form))

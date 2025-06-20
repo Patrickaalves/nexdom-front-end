@@ -5,7 +5,7 @@ import { api } from '../api/http'
 export interface ProductProfit {
   productId:         string
   productCode:       string
-  quantitySold:      number         
+  totalQuantitySold: string         
   totalProfit:       number
   totalGrossRevenue: number
 }
@@ -13,7 +13,7 @@ export interface ProductProfit {
 export interface ProductStock {
   productId:      string
   productCode:    string
-  productType:    string
+  productType:    number
   quantityOut:    number
   stockQuantity:  number
 }
@@ -44,12 +44,14 @@ export const useProductInformationStore = defineStore('productInformations', {
         const { data } = await api.get(`/product/profit-product/${productCode}`)
         console.log('Produto lucro data:', data)
         this.productProfit = {
-          productId: data.productId,
-          productCode: data.productCode,
-          totalQuantitySold: data.totalQuantitySold,  // deve ser totalQuantitySold
-          totalProfit: data.totalNetProfit,
-          totalGrossRevenue: data.totalGrossRevenue,
+          productId:          data.productId,
+          productCode:        data.productCode,
+          totalQuantitySold:  data.quantitySold,
+          totalProfit:        data.totalNetProfit,
+          totalGrossRevenue:  data.totalGrossRevenue,
         }
+        console.log('setando valor')
+        console.log(this.productProfit)
       } catch (e) {
         throw new Error('Erro ao buscar lucro do produto')
       }
